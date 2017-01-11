@@ -109,7 +109,7 @@ class WritePanel(wx.Panel):
 
 class MainFrame(wx.Frame):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, filepath=None, *args, **kwargs):
         """Class for the MainFrame.
 
         The MainFrame takes the same arguments as the wx.Frame class.
@@ -119,11 +119,15 @@ class MainFrame(wx.Frame):
         self.newFileCounter = 1
         filename = _("Untitled %d" % (self.newFileCounter))
 
-        self.SetTitle("%s - pyed" % (filename))
-
         # widgets
         self.CreateStatusBar()
         self.writePanel = WritePanel(filename, self)
+
+        # open file from cli
+        if filepath:
+            self.writePanel.openFile(filepath)
+            filename = os.path.basename(filepath)
+        self.SetTitle("%s - pyed" % (filename))
 
         # create menu
         filemenu = wx.Menu()
@@ -235,10 +239,16 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         self.writePanel.SetFocus()
 
 
-def run():
-    """Run the Application."""
+def run(filepath=None):
+    """Run the Application.
+
+    Parameters
+    ----------
+    filepath : str
+        the path to a file
+    """
     app = wx.App()
-    frame = MainFrame(parent=None, title="pyed",
+    frame = MainFrame(filepath, parent=None, title="pyed",
                       size=(600, 400))
     app.SetTopWindow(frame)
     frame.Show()
