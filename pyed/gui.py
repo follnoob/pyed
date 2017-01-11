@@ -42,7 +42,7 @@ class WritePanel(wx.Panel):
         # stuff
         self.path = None
         self.filename = filename
-        self.fileLoaded = False
+        self.fileLoaded = False  # don't set window to modified when loding a file
 
         # widgets
         self.text = wx.TextCtrl(self, style=wx.TE_MULTILINE)
@@ -68,22 +68,25 @@ class WritePanel(wx.Panel):
         self.text.LoadFile(filepath)
         self.path = filepath
 
-    def saveFile(self, path=None):
-        """This function saves the current file.
-
-        Parameters
-        ----------
-        path : str
-            Path where the file is saved
-        """
-        if path is None:
-            path = self.path
+    def saveFile(self):
+        """This function saves the current file."""
         try:
-            self.text.SaveFile(path)
+            self.text.SaveFile(self.path)
             self.GetParent().SetTitle("%s - pyed" % (self.filename))
         except TypeError:
-            self.GetParent().onSaveAs(None)
-            self.GetParent().SetTitle("%s - pyed" % (self.filename))
+            self.saveFileAs()
+
+    def saveFileAs(self):
+        """Open save file dialog."""
+        parent = self.GetParent()
+        fdlg = wx.FileDialog(parent, _("Save As"),
+                             os.getcwd(), "", "*", wx.FD_SAVE |
+                             wx.FD_OVERWRITE_PROMPT)
+        if fdlg.ShowModal() == wx.ID_OK:
+            self.path = fdlg.GetPath()
+            self.text.SaveFile(self.path)
+            self.filename = fdlg.GetFilename()
+            parent.SetTitle("%s - pyed" % (self.filename))
 
     def onClose(self, event):
         """Close the panel"""
@@ -106,7 +109,7 @@ class WritePanel(wx.Panel):
 
 class MainFrame(wx.Frame):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, filepath=None, *args, **kwargs):
         """Class for the MainFrame.
 
         The MainFrame takes the same arguments as the wx.Frame class.
@@ -116,11 +119,15 @@ class MainFrame(wx.Frame):
         self.newFileCounter = 1
         filename = _("Untitled %d" % (self.newFileCounter))
 
-        self.SetTitle("%s - pyed" % (filename))
-
         # widgets
         self.CreateStatusBar()
         self.writePanel = WritePanel(filename, self)
+
+        # open file from cli
+        if filepath:
+            self.writePanel.openFile(filepath)
+            filename = os.path.basename(filepath)
+        self.SetTitle("%s - pyed" % (filename))
 
         # create menu
         filemenu = wx.Menu()
@@ -185,9 +192,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         info.SetDescription(description)
         info.SetCopyright('Copyright (C) 2017 Jens Wilberg')
         info.SetLicence(licence)
-        info.AddDeveloper("Jens Wilberg")
-        info.AddDocWriter("Jens Wilberg")
-        info.AddTranslator("Jens Wilberg")
+        info.AddDeveloper("Jens Wilberg <jens_wilberg@outlook.com>")
         wx.adv.AboutBox(info)
 
     def showDlg(self, parent, message, title, style):
@@ -200,10 +205,11 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
 
     def onOpen(self, event):
         """Open a file."""
-        self.writePanel.Close()
+        # The filedialog is here becaus I change the panel
         fdlg = wx.FileDialog(self, _("Choose file"),
-                             os.getcwd(), "", "*.*", wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+                             os.getcwd(), "", "*", wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if fdlg.ShowModal() == wx.ID_OK:
+            self.writePanel.Close()
             filename = fdlg.GetFilename()
             self.writePanel = WritePanel(filename, self)
             self.SetTitle("%s - pyed" % (filename))
@@ -219,12 +225,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
 
     def onSaveAs(self, event):
         """Opens save as dialog."""
-        fdlg = wx.FileDialog(self, _("Save As"),
-                             os.getcwd(), "", "*.*", wx.FD_SAVE |
-                             wx.FD_OVERWRITE_PROMPT)
-        if fdlg.ShowModal() == wx.ID_OK:
-            self.writePanel.saveFile(fdlg.GetPath())
-        fdlg.Destroy()
+        self.writePanel.saveFileAs()
 
     def newFile(self, event):
         """"Creates a new file."""
@@ -238,10 +239,16 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         self.writePanel.SetFocus()
 
 
-def run():
-    """Run the Application."""
+def run(filepath=None):
+    """Run the Application.
+
+    Parameters
+    ----------
+    filepath : str
+        the path to a file
+    """
     app = wx.App()
-    frame = MainFrame(parent=None, title="pyed",
+    frame = MainFrame(filepath, parent=None, title="pyed",
                       size=(600, 400))
     app.SetTopWindow(frame)
     frame.Show()

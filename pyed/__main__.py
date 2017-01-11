@@ -18,12 +18,20 @@
 # You should have received a copy of the GNU General Public License
 # along with pyed.  If not, see <http://www.gnu.org/licenses/>.
 """Main Module."""
+import argparse
+import gettext
 from . import gui
+
+_ = gettext.gettext
 
 
 def main():
     """Main."""
-    gui.run()
+    parser = argparse.ArgumentParser(description=_("Simple Texteditor."))
+    parser.add_argument(_("file"), metavar=_("file"), nargs='?',
+                        help=_("the path to a file"))
+    args = parser.parse_args()
+    gui.run(args.file)
 
 
 if __name__ == '__main__':
