@@ -139,8 +139,8 @@ class MainFrame(wx.Frame):
         menuSave = filemenu.Append(wx.ID_SAVE, _("Save", _(" Save file")))
         menuSaveAs = filemenu.Append(
             wx.ID_SAVEAS, _("Save As", _(" Save file as")))
-        menuExit = filemenu.Append(wx.ID_EXIT, _("Exit"), _(" Exit Program"))
         filemenu.AppendSeparator()
+        menuExit = filemenu.Append(wx.ID_EXIT, _("Exit"), _(" Exit Program"))
         menuAbout = helpmenu.Append(wx.ID_ABOUT,
                                     _("About"), _(" Infos about this program"))
 
