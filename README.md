@@ -8,13 +8,22 @@ framework.
 There is no installation required. The only thing you need is Python3
 and wxPython Phoenix.
 
-This program is only tested with Python 3.5 and Linux Mint 18.
+only tested on Python 3.5.
+
+Supported operatingsystems:
+
+- Linux (Main development on Mint 18)
+- Windows 10
 
 ## Usage
 
 you can start pyed with the following command:
 
     python3 pyed.py
+
+## Bugs
+
+- Windows dosen't support wx default shortcuts
 
 ## Author and License
 
