@@ -10,7 +10,7 @@ Version 0.0.3 from 2017/01/11
 Version 0.0.2 from 2017/01/11
 -----------------------------
 
-- fixed bug that the panel was deleted when you click oben file and then
+- fixed bug that the panel was deleted when you click open file and then
   cancel
 - added my e-mail in about
 
