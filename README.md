@@ -13,7 +13,7 @@ only tested on Python 3.5.
 Supported operatingsystems:
 
 - Linux (Main development on Mint 18)
-- Windows (Tested on Windows 10, see [bugs](#bugs) for more information
+- Windows (Tested on Windows 10, see [bugs](#bugs) for more information)
 
 ## Usage
 
