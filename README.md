@@ -13,7 +13,7 @@ only tested on Python 3.5.
 Supported operatingsystems:
 
 - Linux (Main development on Mint 18)
-- Windows 10
+- Windows (Tested on Windows 10, see [bugs](https://github.com/follnoob/pyed#bugs) for more information
 
 ## Usage
 
@@ -23,7 +23,7 @@ you can start pyed with the following command:
 
 ## Bugs
 
-- Windows dosen't support wx default shortcuts
+- Windows: no support of wx default shortcuts and images
 
 ## Author and License
 
