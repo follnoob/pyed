@@ -1,3 +1,4 @@
 [flake8]
-ignore = E266, D101, D401
+ignore = E266, D401
 max-line-length = 100
+exclude = .vscode,__pycahe__,data
