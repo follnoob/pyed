@@ -20,6 +20,19 @@ Supported operatingsystems:
 you can start pyed with the following command:
 
     python3 pyed.py
+    
+## TODO
+
+- search
+- search and replace
+- Translations
+- Better statusbar
+
+maybe:
+
+- Toolbar
+- Multiple files in tab view
+- Basic syntax highlighting
 
 ## Bugs
 
