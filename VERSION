@@ -1,6 +1,12 @@
 pyed
 ====
 
+Version 0.0.4 from 2017/01/DD
+-----------------------------
+
+- fixed error where the filename is not set, when you open a file using CLI
+- implement undo/redo
+
 Version 0.0.3 from 2017/01/11
 -----------------------------
 
