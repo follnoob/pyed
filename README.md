@@ -20,7 +20,7 @@ Supported operatingsystems:
 you can start pyed with the following command:
 
     python3 pyed.py
-    
+
 ## TODO
 
 - search
@@ -36,6 +36,8 @@ maybe:
 
 ## Bugs
 
+- The horizontal scrollbar has an odd behavior
+- Black line at the left site
 - Windows: no support of wx default shortcuts and images
 
 ## Author and License
