@@ -69,7 +69,8 @@ class WritePanel(wx.Panel):
             path to the file
         """
         self.fileLoaded = True
-        self.text.LoadFile(filepath)
+        if os.path.exists(filepath):
+            self.text.LoadFile(filepath)
         self.path = filepath
         self.filename = os.path.basename(filepath)
 
