@@ -20,6 +20,7 @@
 import os
 import wx
 import wx.adv
+import wx.stc
 from .__version__ import VERSION_STRING
 
 _ = wx.GetTranslation
@@ -43,13 +44,16 @@ class WritePanel(wx.Panel):
         self.path = None
         self.filename = filename
         self.fileLoaded = False  # don't set window to modified when loding a file
+        font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL)
 
         # widgets
-        self.text = wx.TextCtrl(self, style=wx.TE_MULTILINE)
+        self.text = wx.stc.StyledTextCtrl(self, style=wx.TE_MULTILINE)
+        self.text.SetMarginWidth(1, 0)
+        self.text.StyleSetFont(0, font)
 
         # Eventhandler
         self.Bind(wx.EVT_CLOSE, self.onClose)
-        self.text.Bind(wx.EVT_TEXT, self.onModify)
+        self.text.Bind(wx.stc.EVT_STC_MODIFIED, self.onModify)
 
         # layout
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -67,6 +71,7 @@ class WritePanel(wx.Panel):
         self.fileLoaded = True
         self.text.LoadFile(filepath)
         self.path = filepath
+        self.filename = os.path.basename(filepath)
 
     def saveFile(self):
         """This function saves the current file."""
@@ -105,6 +110,14 @@ class WritePanel(wx.Panel):
             return
         self.GetParent().SetTitle("*%s - pyed" % (self.filename))
         event.Skip()
+
+    def undo(self):
+        """Undo the last changes."""
+        self.text.Undo()
+
+    def redo(self):
+        """Redo the last changes."""
+        self.text.Redo()
 
 
 class MainFrame(wx.Frame):
@@ -158,6 +171,17 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onSave, menuSave)
         self.Bind(wx.EVT_MENU, self.onSaveAs, menuSaveAs)
         self.Bind(wx.EVT_CLOSE, self.onExit)
+
+        # Accelerator Table
+        table = []
+        eventId = wx.NewId()
+        table.append((wx.ACCEL_CTRL, ord('Z'), eventId))
+        self.Bind(wx.EVT_MENU, self.onUndo, id=eventId)
+        eventId = wx.NewId()
+        table.append((wx.ACCEL_CTRL, ord('Y'), eventId))
+        self.Bind(wx.EVT_MENU, self.onRedo, id=eventId)
+        accTable = wx.AcceleratorTable(table)
+        self.SetAcceleratorTable(accTable)
 
         # layout
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -238,6 +262,14 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         self.Layout()
         self.writePanel.SetFocus()
 
+    def onUndo(self, event):
+        """Undos the last Changes in the current writePanel."""
+        self.writePanel.undo()
+
+    def onRedo(self, event):
+        """Redos the last Changes in the current writePanel."""
+        self.writePanel.redo()
+
 
 def run(filepath=None):
     """Run the Application.
@@ -249,7 +281,7 @@ def run(filepath=None):
     """
     app = wx.App()
     frame = MainFrame(filepath, parent=None, title="pyed",
-                      size=(600, 400))
+                      size=(800, 600))
     app.SetTopWindow(frame)
     frame.Show()
     app.MainLoop()
