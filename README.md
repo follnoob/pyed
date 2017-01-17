@@ -23,7 +23,6 @@ you can start pyed with the following command:
 
 ## TODO
 
-- search
 - search and replace
 - Translations
 - Better statusbar

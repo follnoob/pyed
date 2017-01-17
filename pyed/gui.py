@@ -44,6 +44,7 @@ class WritePanel(wx.Panel):
         self.path = None
         self.filename = filename
         self.fileLoaded = False  # don't set window to modified when loding a file
+        self.lastSearch = (0, 0)
         font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL)
 
         # widgets
@@ -63,7 +64,7 @@ class WritePanel(wx.Panel):
     def openFile(self, filepath):
         """This function opens the given file.
 
-        parameters
+        Parameters
         ----------
         filepath: str
             path to the file
@@ -120,6 +121,37 @@ class WritePanel(wx.Panel):
         """Redo the last changes."""
         self.text.Redo()
 
+    def find(self, findStr, flags):
+        """Find a string in the text.
+
+        Parameters
+        ----------
+        findStr : str or None
+            the string to search. If None, the selected string is used
+        flags : int
+            the sum of flags for the search
+        """
+        if findStr is None:
+            findStr = self.text.GetSelectedText()
+        self.fileLoaded = True
+        if flags & 1:
+            self.text.SearchAnchor()
+            self.text.SearchPrev(flags, findStr)
+        else:
+            self.lastSearch = (self.text.GetInsertionPoint(),
+                               self.text.GetAnchor())
+            self.text.SetInsertionPoint(sum(self.lastSearch))
+            self.text.SearchAnchor()
+            searchVal = self.text.SearchNext(flags, findStr)
+            if searchVal < 0:
+                self.text.SetSelection(*self.lastSearch)
+                self.text.SetAnchor(self.lastSearch[0])
+        self.text.EnsureCaretVisible()
+
+    def resetSearch(self):
+        """Resets the search"""
+        self.lastSearch = (0, 0)
+
 
 class MainFrame(wx.Frame):
 
@@ -145,6 +177,7 @@ class MainFrame(wx.Frame):
 
         # create menu
         filemenu = wx.Menu()
+        searchmenu = wx.Menu()
         helpmenu = wx.Menu()
 
         menuNew = filemenu.Append(wx.ID_NEW, _("New"), _(" Create new file"))
@@ -158,9 +191,17 @@ class MainFrame(wx.Frame):
         menuAbout = helpmenu.Append(wx.ID_ABOUT,
                                     _("About"), _(" Infos about this program"))
 
+        menuFind = searchmenu.Append(
+            wx.ID_FIND, _("Find"), _(" Search for text"))
+        menuFindNext = searchmenu.Append(
+            wx.ID_ANY, _("Find Next"), _(" Search forwards for the same text"))
+        menuFindPrev = searchmenu.Append(
+            wx.ID_ANY, _("Find Previous"), _(" Search backwards for the same text"))
+
         # create menubar
         menubar = wx.MenuBar()
         menubar.Append(filemenu, _("&File"))
+        menubar.Append(searchmenu, _("&Search"))
         menubar.Append(helpmenu, _("&Help"))
         self.SetMenuBar(menubar)
 
@@ -172,6 +213,12 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onSave, menuSave)
         self.Bind(wx.EVT_MENU, self.onSaveAs, menuSaveAs)
         self.Bind(wx.EVT_CLOSE, self.onExit)
+        self.Bind(wx.EVT_MENU, self.onSearch, menuFind)
+        self.Bind(wx.EVT_MENU, self.onSearchNext, menuFindNext)
+        self.Bind(wx.EVT_MENU, self.onSearchPrev, menuFindPrev)
+        self.Bind(wx.EVT_FIND, self.onFind)
+        self.Bind(wx.EVT_FIND_NEXT, self.onFind)
+        self.Bind(wx.EVT_FIND_CLOSE, self.onFindClose)
 
         # Accelerator Table
         table = []
@@ -181,6 +228,9 @@ class MainFrame(wx.Frame):
         eventId = wx.NewId()
         table.append((wx.ACCEL_CTRL, ord('Y'), eventId))
         self.Bind(wx.EVT_MENU, self.onRedo, id=eventId)
+        eventId = wx.NewId()
+        table.append((wx.ACCEL_CTRL, ord('F'), eventId))
+        self.Bind(wx.EVT_MENU, self.onSearch, id=eventId)
         accTable = wx.AcceleratorTable(table)
         self.SetAcceleratorTable(accTable)
 
@@ -270,6 +320,33 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
     def onRedo(self, event):
         """Redos the last Changes in the current writePanel."""
         self.writePanel.redo()
+
+    def onSearch(self, event):
+        """Handles the event if you want to search."""
+        data = wx.FindReplaceData()
+        dlg = wx.FindReplaceDialog(self, data, _("Search"))
+        dlg.data = data  # prevent segmentation faults
+        dlg.Show()
+
+    def onSearchNext(self, event):
+        """Handles the events from the 'Find Next'."""
+        self.writePanel.find(None, 0)
+
+    def onSearchPrev(self, event):
+        """Handles the events from the 'Find Previous'."""
+        self.writePanel.find(None, 1)
+
+    def onFind(self, event):
+        """Handles the evets of the FindReplaceDialog."""
+        findStr = event.GetFindString()
+        flags = event.GetFlags()
+        self.writePanel.find(findStr, flags)
+
+    def onFindClose(self, event):
+        """Handles the close event of the FindReplaceDialog."""
+        dlg = event.GetEventObject()
+        dlg.Destroy()
+        self.writePanel.resetSearch()
 
 
 def run(filepath=None):
