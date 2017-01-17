@@ -2,7 +2,7 @@
 ARGS=""
 
 run:
-	python3 pyed.py $(ARGS) &
+	python3 pyed.py $(ARGS)
 
 clean:
 	find . -name '*.pyc' -exec rm --force {} +
