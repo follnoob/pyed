@@ -18,6 +18,7 @@
 # along with pyed.  If not, see <http://www.gnu.org/licenses/>.
 """GUI for pyed."""
 import os
+import re
 import wx
 import wx.adv
 import wx.stc
@@ -121,17 +122,17 @@ class WritePanel(wx.Panel):
         """Redo the last changes."""
         self.text.Redo()
 
-    def find(self, findStr, flags):
+    def find(self, flags, findStr=""):
         """Find a string in the text.
 
         Parameters
         ----------
-        findStr : str or None
-            the string to search. If None, the selected string is used
         flags : int
-            the sum of flags for the search
+            The sum of flags for the search
+        findStr : str
+            The string to search. If empty, the selected string is used
         """
-        if findStr is None:
+        if not findStr:
             findStr = self.text.GetSelectedText()
         self.fileLoaded = True
         if flags & 1:
@@ -147,6 +148,37 @@ class WritePanel(wx.Panel):
                 self.text.SetSelection(*self.lastSearch)
                 self.text.SetAnchor(self.lastSearch[0])
         self.text.EnsureCaretVisible()
+
+    def replace(self, replaceStr, findStr):
+        """Replaces the found string with replaceStr.
+
+        Parameters
+        ----------
+        replaceStr : str
+            String wich replaces the found string
+        findStr : str
+            The string to search
+        """
+        select = self.text.GetSelectedText()
+        if select == findStr:
+            self.text.ReplaceSelection(replaceStr)
+
+    def replaceAll(self, replaceStr, findStr):
+        """Replaces all findStr with replaceStr.
+
+        Parameters
+        ----------
+        replaceStr : str
+            String wich replaces the found string
+        findStr : str
+            The string to search
+        """
+        text = self.text.GetValue()
+        # Find start position
+        positions = [m.start()
+                     for m in re.finditer(findStr, text)]
+        for start in positions:
+            self.text.Replace(start, start + len(findStr), replaceStr)
 
     def resetSearch(self):
         """Resets the search"""
@@ -197,6 +229,8 @@ class MainFrame(wx.Frame):
             wx.ID_ANY, _("Find Next"), _(" Search forwards for the same text"))
         menuFindPrev = searchmenu.Append(
             wx.ID_ANY, _("Find Previous"), _(" Search backwards for the same text"))
+        menuFindRep = searchmenu.Append(
+            wx.ID_REPLACE, _("Find and Replace"), _(" Search for and replace text"))
 
         # create menubar
         menubar = wx.MenuBar()
@@ -216,8 +250,11 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onSearch, menuFind)
         self.Bind(wx.EVT_MENU, self.onSearchNext, menuFindNext)
         self.Bind(wx.EVT_MENU, self.onSearchPrev, menuFindPrev)
+        self.Bind(wx.EVT_MENU, self.onSearchAndReplace, menuFindRep)
         self.Bind(wx.EVT_FIND, self.onFind)
         self.Bind(wx.EVT_FIND_NEXT, self.onFind)
+        self.Bind(wx.EVT_FIND_REPLACE, self.onReplace)
+        self.Bind(wx.EVT_FIND_REPLACE_ALL, self.onReplaceAll)
         self.Bind(wx.EVT_FIND_CLOSE, self.onFindClose)
 
         # Accelerator Table
@@ -231,6 +268,9 @@ class MainFrame(wx.Frame):
         eventId = wx.NewId()
         table.append((wx.ACCEL_CTRL, ord('F'), eventId))
         self.Bind(wx.EVT_MENU, self.onSearch, id=eventId)
+        #eventId = wx.NewId()
+        #table.append((wx.ACCEL_CTRL, ord('R'), eventId))
+        #self.Bind(wx.EVT_MENU, self.onSearchAndReplace, id=eventId)
         accTable = wx.AcceleratorTable(table)
         self.SetAcceleratorTable(accTable)
 
@@ -324,23 +364,43 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
     def onSearch(self, event):
         """Handles the event if you want to search."""
         data = wx.FindReplaceData()
-        dlg = wx.FindReplaceDialog(self, data, _("Search"))
+        dlg = wx.FindReplaceDialog(self, data, _("Find"))
+        dlg.data = data  # prevent segmentation faults
+        dlg.Show()
+
+    def onSearchAndReplace(self, event):
+        """Opens search and replace dialog."""
+        data = wx.FindReplaceData()
+        dlg = wx.FindReplaceDialog(self, data, _(
+            "Find and Replace"), style=wx.FR_REPLACEDIALOG)
         dlg.data = data  # prevent segmentation faults
         dlg.Show()
 
     def onSearchNext(self, event):
         """Handles the events from the 'Find Next'."""
-        self.writePanel.find(None, 0)
+        self.writePanel.find(0)
 
     def onSearchPrev(self, event):
         """Handles the events from the 'Find Previous'."""
-        self.writePanel.find(None, 1)
+        self.writePanel.find(1)
 
     def onFind(self, event):
-        """Handles the evets of the FindReplaceDialog."""
+        """Handles the events of the FindReplaceDialog."""
         findStr = event.GetFindString()
         flags = event.GetFlags()
-        self.writePanel.find(findStr, flags)
+        self.writePanel.find(flags, findStr)
+
+    def onReplace(self, event):
+        """Handles replace event."""
+        replaceStr = event.GetReplaceString()
+        findStr = event.GetFindString()
+        self.writePanel.replace(replaceStr, findStr)
+
+    def onReplaceAll(self, event):
+        """Handles replace all event."""
+        replaceStr = event.GetReplaceString()
+        findStr = event.GetFindString()
+        self.writePanel.replaceAll(replaceStr, findStr)
 
     def onFindClose(self, event):
         """Handles the close event of the FindReplaceDialog."""
