@@ -1,12 +1,12 @@
 # pyed
 
-Pyed is a simple text editor written in Python3 with wxPython Phoenix
+Pyed is a simple text editor written in Python3 with the wxPython Phoenix
 framework.
 
 ## Installation
 
 There is no installation required. The only thing you need is Python3
-and wxPython Phoenix.
+and [wxPython Phoenix](https://github.com/wxWidgets/Phoenix).
 
 only tested on Python 3.5.
 
@@ -23,20 +23,19 @@ you can start pyed with the following command:
 
 ## TODO
 
-- search and replace
-- Translations
 - Better statusbar
+- Translations
 
-maybe:
+Things i maybe implement:
 
 - Toolbar
 - Multiple files in tab view
 - Basic syntax highlighting
 
-## Bugs
+## Known Bugs
 
-- The horizontal scrollbar has an odd behavior
-- Black line at the left site
+- The horizontal scrollbar has an odd behavior (standard in wx.stc.StyledTextCtrl)
+- Linux Mint 18: Black line at the left site
 - Windows: no support of wx default shortcuts and images
 
 ## Author and License

@@ -1,10 +1,12 @@
 pyed
 ====
 
-Next Version 0.0.5 from 2017/MM/DD
+Version 0.0.5 from 2017/01/19
 -----------------------------
 
-- implement search
+- implement search and replace
+- added edit menu
+- added shortcutf for Find Next and Previous
 
 Version 0.0.4 from 2017/01/13
 -----------------------------

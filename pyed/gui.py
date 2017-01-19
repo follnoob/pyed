@@ -62,6 +62,26 @@ class WritePanel(wx.Panel):
         sizer.Add(self.text, 1, wx.EXPAND, 1)
         self.SetSizerAndFit(sizer)
 
+    ## EventHandler ##
+    def onClose(self, event):
+        """Close the panel"""
+        if self.text.IsModified():
+            parent = self.GetParent()
+            retval = parent.showDlg(parent, _("There are unsaved changes.\n Do you want to save"), _(
+                "Unsaved Canges"), wx.YES_NO | wx.YES_DEFAULT)
+            if retval == wx.ID_YES:
+                self.saveFile()
+        self.Destroy()
+
+    def onModify(self, event):
+        """Schows in title if text is modified."""
+        if self.fileLoaded:
+            self.fileLoaded = False
+            return
+        self.GetParent().SetTitle("*%s - pyed" % (self.filename))
+        event.Skip()
+
+    ## Methods ##
     def openFile(self, filepath):
         """This function opens the given file.
 
@@ -81,6 +101,7 @@ class WritePanel(wx.Panel):
         try:
             self.text.SaveFile(self.path)
             self.GetParent().SetTitle("%s - pyed" % (self.filename))
+            self.text.SetSavePoint()
         except TypeError:
             self.saveFileAs()
 
@@ -95,24 +116,17 @@ class WritePanel(wx.Panel):
             self.text.SaveFile(self.path)
             self.filename = fdlg.GetFilename()
             parent.SetTitle("%s - pyed" % (self.filename))
+            self.text.SetSavePoint()
 
-    def onClose(self, event):
-        """Close the panel"""
-        if self.text.IsModified():
-            parent = self.GetParent()
-            retval = parent.showDlg(parent, _("There are unsaved changes.\n Do you want to save"), _(
-                "Unsaved Canges"), wx.YES_NO | wx.YES_DEFAULT)
-            if retval == wx.ID_YES:
-                self.saveFile()
-        self.Destroy()
+    def hasSelection(self):
+        """Check if somthing is selected.
 
-    def onModify(self, event):
-        """Schows in title if text is modified."""
-        if self.fileLoaded:
-            self.fileLoaded = False
-            return
-        self.GetParent().SetTitle("*%s - pyed" % (self.filename))
-        event.Skip()
+        Returns
+        -------
+        bool
+            True if somthing is selected. Elese False
+        """
+        return True if self.text.GetSelectedText() else False
 
     def undo(self):
         """Undo the last changes."""
@@ -121,6 +135,22 @@ class WritePanel(wx.Panel):
     def redo(self):
         """Redo the last changes."""
         self.text.Redo()
+
+    def cut(self):
+        """Cuts the selection to the clipbord."""
+        self.text.Cut()
+
+    def copy(self):
+        """Copies the selection to the clipbord."""
+        self.text.Copy()
+
+    def paste(self):
+        """Paste from the clipbord."""
+        self.text.Paste()
+
+    def selectAll(self):
+        """Select all text in the entire document."""
+        self.text.SelectAll()
 
     def find(self, flags, findStr=""):
         """Find a string in the text.
@@ -209,32 +239,49 @@ class MainFrame(wx.Frame):
 
         # create menu
         filemenu = wx.Menu()
+        editmenu = wx.Menu()
         searchmenu = wx.Menu()
         helpmenu = wx.Menu()
 
         menuNew = filemenu.Append(wx.ID_NEW, _("New"), _(" Create new file"))
         menuOpen = filemenu.Append(wx.ID_OPEN, _("Open"), _(" Open file"))
         filemenu.AppendSeparator()
-        menuSave = filemenu.Append(wx.ID_SAVE, _("Save", _(" Save file")))
+        menuSave = filemenu.Append(wx.ID_SAVE, _("Save"), _(" Save file"))
         menuSaveAs = filemenu.Append(
-            wx.ID_SAVEAS, _("Save As", _(" Save file as")))
+            wx.ID_SAVEAS, _("Save As"), _(" Save file as"))
         filemenu.AppendSeparator()
         menuExit = filemenu.Append(wx.ID_EXIT, _("Exit"), _(" Exit Program"))
         menuAbout = helpmenu.Append(wx.ID_ABOUT,
                                     _("About"), _(" Infos about this program"))
 
+        menuUndo = editmenu.Append(wx.ID_UNDO, _(
+            "Undo\tCTRL+Z"), _(" Undo the last action"))
+        menuRedo = editmenu.Append(wx.ID_REDO, _(
+            "Redo\tCTRL+Y"), _(" Redo the last action"))
+        editmenu.AppendSeparator()
+        self.menuCut = editmenu.Append(wx.ID_CUT, _(
+            "Cut"), _(" Cut the selection"))
+        self.menuCopy = editmenu.Append(wx.ID_COPY, _(
+            "Copy"), _(" Copy the selection"))
+        menuPaste = editmenu.Append(wx.ID_PASTE, _(
+            "Paste"), _(" Paste the clipbord"))
+        editmenu.AppendSeparator()
+        menuSelectAll = editmenu.Append(wx.ID_SELECTALL, _(
+            "Select All"), _(" Select the text in the entire document"))
+
         menuFind = searchmenu.Append(
             wx.ID_FIND, _("Find"), _(" Search for text"))
         menuFindNext = searchmenu.Append(
-            wx.ID_ANY, _("Find Next"), _(" Search forwards for the same text"))
+            wx.ID_ANY, _("Find Next\tCTRL+G"), _(" Search forwards for the same text"))
         menuFindPrev = searchmenu.Append(
-            wx.ID_ANY, _("Find Previous"), _(" Search backwards for the same text"))
+            wx.ID_ANY, _("Find Previous\tSHIFT+CTRL+G"), _(" Search backwards for the same text"))
         menuFindRep = searchmenu.Append(
             wx.ID_REPLACE, _("Find and Replace"), _(" Search for and replace text"))
 
         # create menubar
         menubar = wx.MenuBar()
         menubar.Append(filemenu, _("&File"))
+        menubar.Append(editmenu, _("&Edit"))
         menubar.Append(searchmenu, _("&Search"))
         menubar.Append(helpmenu, _("&Help"))
         self.SetMenuBar(menubar)
@@ -247,10 +294,20 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onSave, menuSave)
         self.Bind(wx.EVT_MENU, self.onSaveAs, menuSaveAs)
         self.Bind(wx.EVT_CLOSE, self.onExit)
+
+        editmenu.Bind(wx.EVT_MENU_OPEN, self.onEdit)
+        self.Bind(wx.EVT_MENU, self.onUndo, menuUndo)
+        self.Bind(wx.EVT_MENU, self.onRedo, menuRedo)
+        self.Bind(wx.EVT_MENU, self.onCut, self.menuCut)
+        self.Bind(wx.EVT_MENU, self.onCopy, self.menuCopy)
+        self.Bind(wx.EVT_MENU, self.onPaste, menuPaste)
+        self.Bind(wx.EVT_MENU, self.onSelectAll, menuSelectAll)
+
         self.Bind(wx.EVT_MENU, self.onSearch, menuFind)
         self.Bind(wx.EVT_MENU, self.onSearchNext, menuFindNext)
         self.Bind(wx.EVT_MENU, self.onSearchPrev, menuFindPrev)
         self.Bind(wx.EVT_MENU, self.onSearchAndReplace, menuFindRep)
+
         self.Bind(wx.EVT_FIND, self.onFind)
         self.Bind(wx.EVT_FIND_NEXT, self.onFind)
         self.Bind(wx.EVT_FIND_REPLACE, self.onReplace)
@@ -268,6 +325,12 @@ class MainFrame(wx.Frame):
         eventId = wx.NewId()
         table.append((wx.ACCEL_CTRL, ord('F'), eventId))
         self.Bind(wx.EVT_MENU, self.onSearch, id=eventId)
+        eventId = wx.NewId()
+        table.append((wx.ACCEL_SHIFT | wx.ACCEL_CTRL, ord('G'), eventId))
+        self.Bind(wx.EVT_MENU, self.onSearchPrev, id=eventId)
+        eventId = wx.NewId()
+        table.append((wx.ACCEL_CTRL, ord('F'), eventId))
+        self.Bind(wx.EVT_MENU, self.onSearch, id=eventId)
         #eventId = wx.NewId()
         #table.append((wx.ACCEL_CTRL, ord('R'), eventId))
         #self.Bind(wx.EVT_MENU, self.onSearchAndReplace, id=eventId)
@@ -279,6 +342,7 @@ class MainFrame(wx.Frame):
         sizer.Add(self.writePanel, 1, wx.EXPAND, 1)
         self.SetSizer(sizer)
 
+    ## EventHandler ##
     def onExit(self, event):
         """Handel exit event."""
         self.writePanel.Close()
@@ -310,14 +374,6 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         info.AddDeveloper("Jens Wilberg <jens_wilberg@outlook.com>")
         wx.adv.AboutBox(info)
 
-    def showDlg(self, parent, message, title, style):
-        """Displays a dialog."""
-        dlg = wx.MessageDialog(parent=parent, message=message,
-                               caption=title, style=style)
-        retval = dlg.ShowModal()
-        dlg.Destroy()
-        return retval
-
     def onOpen(self, event):
         """Open a file."""
         # The filedialog is here becaus I change the panel
@@ -342,16 +398,14 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         """Opens save as dialog."""
         self.writePanel.saveFileAs()
 
-    def newFile(self, event):
-        """"Creates a new file."""
-        self.writePanel.Close()
-        self.newFileCounter += 1
-        filename = _("Untitled %d" % (self.newFileCounter))
-        self.writePanel = WritePanel(filename, self)
-        self.SetTitle("%s - pyed" % (filename))
-        self.GetSizer().Add(self.writePanel, 1, wx.EXPAND, 1)
-        self.Layout()
-        self.writePanel.SetFocus()
+    def onEdit(self, event):
+        """Handles edit menu event."""
+        if self.writePanel.hasSelection():
+            self.menuCut.Enable(True)
+            self.menuCopy.Enable(True)
+        else:
+            self.menuCut.Enable(False)
+            self.menuCopy.Enable(False)
 
     def onUndo(self, event):
         """Undos the last Changes in the current writePanel."""
@@ -360,6 +414,22 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
     def onRedo(self, event):
         """Redos the last Changes in the current writePanel."""
         self.writePanel.redo()
+
+    def onCut(self, event):
+        """Handles cut event."""
+        self.writePanel.cut()
+
+    def onCopy(self, event):
+        """Handles copy event."""
+        self.writePanel.copy()
+
+    def onPaste(self, event):
+        """Handles paste event."""
+        self.writePanel.paste()
+
+    def onSelectAll(self, event):
+        """Handles select all event."""
+        self.writePanel.selectAll()
 
     def onSearch(self, event):
         """Handles the event if you want to search."""
@@ -407,6 +477,26 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         dlg = event.GetEventObject()
         dlg.Destroy()
         self.writePanel.resetSearch()
+
+    ## Methods ##
+    def newFile(self, event):
+        """"Creates a new file."""
+        self.writePanel.Close()
+        self.newFileCounter += 1
+        filename = _("Untitled %d" % (self.newFileCounter))
+        self.writePanel = WritePanel(filename, self)
+        self.SetTitle("%s - pyed" % (filename))
+        self.GetSizer().Add(self.writePanel, 1, wx.EXPAND, 1)
+        self.Layout()
+        self.writePanel.SetFocus()
+
+    def showDlg(self, parent, message, title, style):
+        """Displays a dialog."""
+        dlg = wx.MessageDialog(parent=parent, message=message,
+                               caption=title, style=style)
+        retval = dlg.ShowModal()
+        dlg.Destroy()
+        return retval
 
 
 def run(filepath=None):
