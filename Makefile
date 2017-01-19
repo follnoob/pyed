@@ -1,5 +1,5 @@
 .PHONY: clean
-ARGS=""
+ARGS=
 
 run:
 	python3 pyed.py $(ARGS)
