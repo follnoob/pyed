@@ -77,9 +77,10 @@ class WritePanel(wx.Panel):
     def onModify(self, event):
         """Schows in title if text is modified."""
         if self.fileLoaded:
-            self.fileLoaded = False
+            event.Skip()
             return
         self.GetParent().SetTitle("*%s - pyed" % (self.filename))
+        event.Skip()
 
     def updateLineCol(self, event):
         """Updates the line and col number on statusbar."""
@@ -106,6 +107,7 @@ class WritePanel(wx.Panel):
         self.fileLoaded = True
         if os.path.exists(filepath):
             self.text.LoadFile(filepath)
+        self.fileLoaded = False
         self.path = filepath
         self.filename = os.path.basename(filepath)
 
@@ -177,7 +179,6 @@ class WritePanel(wx.Panel):
         """
         if not findStr:
             findStr = self.text.GetSelectedText()
-        self.fileLoaded = True
         if flags & 1:
             self.text.SearchAnchor()
             self.text.SearchPrev(flags, findStr)
