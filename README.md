@@ -1,7 +1,8 @@
 # pyed
 
 Pyed is a simple text editor written in Python3 with the wxPython Phoenix
-framework.
+framework. I think the editor is now usable, so I updated it to beta status.
+Pleas open an issue for every bug you found.
 
 ## Installation
 
@@ -21,12 +22,7 @@ you can start pyed with the following command:
 
     python3 pyed.py
 
-## TODO
-
-- Better statusbar
-- Translations
-
-Things i maybe implement:
+## Things i maybe implement
 
 - Toolbar
 - Multiple files in tab view

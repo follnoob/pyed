@@ -1,12 +1,15 @@
 pyed
 ====
 
-Version 0.0.5 from 2017/01/19
+Version 0.1.0 from 2017/01/19
 -----------------------------
 
+- official beta: It is usable!
 - implement search and replace
 - added edit menu
 - added shortcutf for Find Next and Previous
+- added line and column number to statusbar
+- fixed file is marked as modified when load
 
 Version 0.0.4 from 2017/01/13
 -----------------------------
