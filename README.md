@@ -2,7 +2,7 @@
 
 Pyed is a simple text editor written in Python3 with the wxPython Phoenix
 framework. I think the editor is now usable, so I updated it to beta status.
-Pleas open an issue for every bug you found.
+Pleas open an [issue](https://github.com/follnoob/pyed/issues/new) for every bug you found.
 
 ## Installation
 
