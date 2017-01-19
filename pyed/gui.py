@@ -56,6 +56,7 @@ class WritePanel(wx.Panel):
         # Eventhandler
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.text.Bind(wx.stc.EVT_STC_MODIFIED, self.onModify)
+        self.text.Bind(wx.stc.EVT_STC_UPDATEUI, self.updateLineCol)
 
         # layout
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -79,7 +80,19 @@ class WritePanel(wx.Panel):
             self.fileLoaded = False
             return
         self.GetParent().SetTitle("*%s - pyed" % (self.filename))
-        event.Skip()
+
+    def updateLineCol(self, event):
+        """Updates the line and col number on statusbar."""
+        bl, c, l = self.text.PositionToXY(self.text.GetInsertionPoint())
+        status = "Line: %d Column: %d" % (l, c)
+        statusbar = self.GetParent().GetStatusBar()
+        statusbar.SetStatusText(status, 1)
+        # ugly method to change the size of a statusbar column
+        font = statusbar.GetFont()
+        dc = wx.WindowDC(statusbar)
+        dc.SetFont(font)
+        width, height = dc.GetTextExtent(status)
+        statusbar.SetStatusWidths([-1, width + 30])
 
     ## Methods ##
     def openFile(self, filepath):
@@ -228,7 +241,8 @@ class MainFrame(wx.Frame):
         filename = _("Untitled %d" % (self.newFileCounter))
 
         # widgets
-        self.CreateStatusBar()
+        statusbar = self.CreateStatusBar(2)
+        statusbar.SetStatusWidths([-1, 125])
         self.writePanel = WritePanel(filename, self)
 
         # open file from cli
