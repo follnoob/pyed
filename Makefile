@@ -3,8 +3,6 @@
 PYTHON=python3
 # Arguments for run
 ARGS=
-# Version of pyed
-VERSION=0.1.0
 
 release: sdist wheel
 
