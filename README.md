@@ -10,9 +10,15 @@ You need to install Python3 and [wxPython Phoenix](https://github.com/wxWidgets/
 as requirements.
 
 To install this package run
+
     make install
+
 or
+
     python3 setup.py install
+
+On Linux you can copy pyed.desktop to /usr/share/applications or ~/.local/applications
+to integrate pyed to your menu. Also you can use this file as desktop shortcut.
 
 only tested on Python 3.5.
 

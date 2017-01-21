@@ -2,6 +2,7 @@
 include LICENSE.txt
 include README.md
 include VERSION.txt
+include pyed.desktop
 
 # Include the data files
 #recursive-include data *
