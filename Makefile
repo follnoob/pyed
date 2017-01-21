@@ -1,4 +1,4 @@
-.PHONY: clean tar zip dir
+.PHONY: clean tar zip clean_py
 PYTHON=python3  # Python path
 ARGS=			# Arguments for run
 VERSION=  		# Version for the zip and tar (start with '-')
