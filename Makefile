@@ -1,7 +1,10 @@
 .PHONY: clean tar zip clean_py release  
-PYTHON=python3  # Python path
-ARGS=			# Arguments for run
-VERSION=0.1.0	# Version of pyed
+# Python path
+PYTHON=python3
+# Arguments for run
+ARGS=
+# Version of pyed
+VERSION=0.1.0
 
 release: sdist wheel
 
