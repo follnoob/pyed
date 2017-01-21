@@ -18,9 +18,6 @@ install:
 run:
 	$(PYTHON) -m pyed $(ARGS)
 
-$(OUT_DIR):
-	mkdir -p $(OUT_DIR)
-
 clean_py:
 	find . -name '*.pyc' -exec rm --force {} +
 	find . -name '*.pyo' -exec rm --force {} +
