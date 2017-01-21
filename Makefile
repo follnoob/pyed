@@ -1,8 +1,16 @@
 .PHONY: clean
-ARGS=
+PYTHON=python3  # Python path
+ARGS=			# Arguments for run
+VERSION=  		# Version for the zip and tar (start with '-')
 
 run:
-	python3 pyed.py $(ARGS)
+	$(PYTHON) pyed.py $(ARGS)
+
+tar: clean
+	tar -cvzf pyed$(VERSION).tar.gz pyed *.py README.md VERSION LICENSE
+
+zip: clean
+	zip -r pyed$(VERSION).zip pyed *.py VERSION README.md LICENSE
 
 clean:
 	find . -name '*.pyc' -exec rm --force {} +
