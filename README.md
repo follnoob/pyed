@@ -17,7 +17,7 @@ or
 
     python3 setup.py install
 
-On Linux you can copy pyed.desktop to /usr/share/applications or ~/.local/applications
+On Linux you can copy pyed.desktop to /usr/share/applications or ~/.local/share/applications
 to integrate pyed to your menu. Also you can use this file as desktop shortcut.
 
 only tested on Python 3.5.
