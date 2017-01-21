@@ -17,9 +17,6 @@ wheel:
 install:
 	$(PYTHON) setup.py install
 
-install_pip: wheel
-	$(PYTHON) -m pip install dist/pyed-$(VERSION)-py-none-any.whl
-
 run:
 	$(PYTHON) -m pyed $(ARGS)
 
