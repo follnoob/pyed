@@ -18,12 +18,6 @@ install:
 run:
 	$(PYTHON) -m pyed $(ARGS)
 
-clean_py:
-	find . -name '*.pyc' -exec rm --force {} +
-	find . -name '*.pyo' -exec rm --force {} +
-	find . -name '*~' -exec rm --force  {} +
-	find . -name "__pycache__" -type d -exec rm -rf {} +
-
 clean: clean_py
 	rm -rf $(OUT_DIR)
 	rm -rf pyed.egg-info
