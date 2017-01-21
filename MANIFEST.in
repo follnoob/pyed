@@ -1,0 +1,7 @@
+# Include files
+include LICENSE.txt
+include README.md
+include VERSION.txt
+
+# Include the data files
+#recursive-include data *

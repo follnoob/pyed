@@ -6,8 +6,13 @@ Pleas open an [issue](https://github.com/follnoob/pyed/issues/new) for every bug
 
 ## Installation
 
-There is no installation required. The only thing you need is Python3
-and [wxPython Phoenix](https://github.com/wxWidgets/Phoenix).
+You need to install Python3 and [wxPython Phoenix](https://github.com/wxWidgets/Phoenix)
+as requirements.
+
+To install this package run
+    make install
+or
+    python3 setup.py install
 
 only tested on Python 3.5.
 
@@ -18,9 +23,9 @@ Supported operatingsystems:
 
 ## Usage
 
-you can start pyed with the following command:
+If you installed pyed you can start it with the command
 
-    python3 pyed.py
+    pyed
 
 ## Things i maybe implement
 

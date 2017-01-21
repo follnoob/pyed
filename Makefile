@@ -1,19 +1,24 @@
-.PHONY: clean tar zip clean_py
+.PHONY: clean tar zip clean_py release  
 PYTHON=python3  # Python path
 ARGS=			# Arguments for run
-VERSION=  		# Version for the zip and tar (start with '-')
-OUT_DIR=dist	# dist folder as output
+VERSION=0.1.0	# Version of pyed
+
+release: sdist wheel
+
+sdist:
+	$(PYTHON) setup.py sdist
+
+wheel:
+	$(PYTHON) setup.py bdist_wheel
+
+install:
+	$(PYTHON) setup.py install
+
+install_pip: wheel
+	$(PYTHON) -m pip install dist/pyed-$(VERSION)-py-none-any.whl
 
 run:
-	$(PYTHON) pyed.py $(ARGS)
-
-tar: clean_py $(OUT_DIR)
-	tar -cvzf pyed$(VERSION).tar.gz pyed *.py README.md VERSION.txt LICENSE.txt
-	mv *.tar.gz $(OUT_DIR)
-
-zip: clean_py $(OUT_DIR)
-	zip -r $(OUT_DIR)/pyed$(VERSION).zip pyed *.py VERSION.txt README.md LICENSE.txt
-	mv *.zip $(OUT_DIR)
+	$(PYTHON) -m pyed $(ARGS)
 
 $(OUT_DIR):
 	mkdir -p $(OUT_DIR)
@@ -26,3 +31,6 @@ clean_py:
 
 clean: clean_py
 	rm -rf $(OUT_DIR)
+	rm -rf pyed.egg-info
+	rm -rf build
+	rm -rf dist
