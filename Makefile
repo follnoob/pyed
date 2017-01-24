@@ -1,4 +1,4 @@
-.PHONY: clean tar zip clean_py release  
+.PHONY: clean tar zip release  
 # Python path
 PYTHON=python3
 # Arguments for run
@@ -18,8 +18,7 @@ install:
 run:
 	$(PYTHON) -m pyed $(ARGS)
 
-clean: clean_py
-	rm -rf $(OUT_DIR)
+clean:
 	rm -rf pyed.egg-info
 	rm -rf build
 	rm -rf dist
