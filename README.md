@@ -25,25 +25,18 @@ only tested on Python 3.5.
 Supported operatingsystems:
 
 - Linux (Main development on Mint 18)
-- Windows (Tested on Windows 10, see [bugs](#bugs) for more information)
+- Windows (Tested on Windows 10)
 
 ## Usage
 
 If you installed pyed you can start it with the command
 
     pyed
-
-## Things i maybe implement
-
-- Toolbar
-- Multiple files in tab view
-- Basic syntax highlighting
-
-## Known Bugs
-
-- The horizontal scrollbar has an odd behavior (standard in wx.stc.StyledTextCtrl)
-- Linux Mint 18: Black line at the left site
-- Windows: no support of wx default shortcuts and images
+    
+When you want to open or create a file you can use the
+cli 
+    
+    pyed path/to/file
 
 ## Author and License
 
