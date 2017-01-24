@@ -7,7 +7,8 @@ Pleas open an [issue](https://github.com/follnoob/pyed/issues/new) for every bug
 ## Installation
 
 You need to install Python3 and [wxPython Phoenix](https://github.com/wxWidgets/Phoenix)
-as requirements.
+as requirements. You can find a installation guid for Phoenix
+[here](https://wiki.wxpython.org/How%20to%20install%20wxPython#Installing_wxPython-Phoenix_using_pip)
 
 To install this package run
 
