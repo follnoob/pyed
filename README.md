@@ -7,7 +7,7 @@ Pleas open an [issue](https://github.com/follnoob/pyed/issues/new) for every bug
 ## Installation
 
 You need to install Python3 and [wxPython Phoenix](https://github.com/wxWidgets/Phoenix)
-as requirements. You can find a installation guid for Phoenix
+as requirements. You can find an installation guid for Phoenix
 [here](https://wiki.wxpython.org/How%20to%20install%20wxPython#Installing_wxPython-Phoenix_using_pip)
 
 To install this package run
@@ -34,8 +34,7 @@ If you installed pyed you can start it with the command
 
     pyed
     
-When you want to open or create a file you can use the
-cli 
+When you want to open or create a file you can use the  cli 
     
     pyed path/to/file
 
