@@ -1,10 +1,10 @@
-.PHONY: clean tar zip release  
+.PHONY: run clean build sdist wheel
 # Python path
 PYTHON=python3
 # Arguments for run
 ARGS=
 
-release: sdist wheel
+build: sdist wheel
 
 sdist:
 	$(PYTHON) setup.py sdist
