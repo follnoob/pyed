@@ -7,7 +7,7 @@ Pleas open an [issue](https://github.com/follnoob/pyed/issues/new) for every bug
 ## Installation
 
 You need to install Python3 and [wxPython Phoenix](https://github.com/wxWidgets/Phoenix)
-as requirements. You can find an installation guid for Phoenix
+as requirements. You can find an installation guide for Phoenix
 [here](https://wiki.wxpython.org/How%20to%20install%20wxPython#Installing_wxPython-Phoenix_using_pip)
 
 To install this package run
@@ -19,11 +19,11 @@ or
     python3 setup.py install
 
 On Linux you can copy pyed.desktop to /usr/share/applications or ~/.local/share/applications
-to integrate pyed to your menu. Also you can use this file as desktop shortcut.
+to integrate pyed to your menu. Also you can use this file as desktop short-cut.
 
 only tested on Python 3.5.
 
-Supported operatingsystems:
+Supported operating-systems:
 
 - Linux (Main development on Mint 18)
 - Windows (Tested on Windows 10)
