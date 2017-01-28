@@ -19,9 +19,11 @@
 """GUI for pyed."""
 import os
 import re
+
 import wx
 import wx.adv
 import wx.stc
+
 from .__version__ import VERSION_STRING
 
 _ = wx.GetTranslation
@@ -68,8 +70,8 @@ class WritePanel(wx.Panel):
         """Close the panel"""
         if self.text.IsModified():
             parent = self.GetParent()
-            retval = parent.showDlg(parent, _("There are unsaved changes.\n Do you want to save"), _(
-                "Unsaved Canges"), wx.YES_NO | wx.YES_DEFAULT)
+            retval = parent.showDlg(parent, _("There are unsaved changes.\n Do you want to save"),
+                                    _("Unsaved Canges"), wx.YES_NO | wx.YES_DEFAULT)
             if retval == wx.ID_YES:
                 self.saveFile()
         self.Destroy()
@@ -346,9 +348,9 @@ class MainFrame(wx.Frame):
         eventId = wx.NewId()
         table.append((wx.ACCEL_CTRL, ord('F'), eventId))
         self.Bind(wx.EVT_MENU, self.onSearch, id=eventId)
-        #eventId = wx.NewId()
-        #table.append((wx.ACCEL_CTRL, ord('R'), eventId))
-        #self.Bind(wx.EVT_MENU, self.onSearchAndReplace, id=eventId)
+        # eventId = wx.NewId()
+        # table.append((wx.ACCEL_CTRL, ord('R'), eventId))
+        # self.Bind(wx.EVT_MENU, self.onSearchAndReplace, id=eventId)
         accTable = wx.AcceleratorTable(table)
         self.SetAcceleratorTable(accTable)
 
