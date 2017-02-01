@@ -1,5 +1,5 @@
 # pyed
-[![license](https://img.shields.io/github/license/follnoob/pyed.svg)](https://github.com/follnoob/pyed/blob/master/LICENSE.txt)
+[![license](https://img.shields.io/github/license/follnoob/pyed.svg)](https://choosealicense.com/licenses/gpl-3.0/)
 
 Pyed is a simple text editor written in Python3 with the wxPython Phoenix
 framework. I think the editor is now usable, so I updated it to beta status.
