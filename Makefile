@@ -1,8 +1,6 @@
-.PHONY: run clean build sdist wheel
+.PHONY: clean build sdist wheel
 # Python path
 PYTHON=python3
-# Arguments for run
-ARGS=
 
 build: sdist wheel
 
@@ -14,9 +12,6 @@ wheel:
 
 install:
 	$(PYTHON) setup.py install
-
-run:
-	$(PYTHON) -m pyed $(ARGS)
 
 clean:
 	rm -rf pyed.egg-info

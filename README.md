@@ -1,4 +1,5 @@
 # pyed
+
 [![license](https://img.shields.io/github/license/follnoob/pyed.svg)](https://choosealicense.com/licenses/gpl-3.0/)
 
 Pyed is a simple text editor written in Python3 with the wxPython Phoenix
@@ -34,9 +35,9 @@ Supported operating-systems:
 If you installed pyed you can start it with the command
 
     pyed
-    
+
 When you want to open or create a file you can use the  cli 
-    
+
     pyed path/to/file
 
 ## Author and License
