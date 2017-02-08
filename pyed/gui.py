@@ -48,12 +48,10 @@ class WritePanel(wx.Panel):
         self.filename = filename
         self.fileLoaded = False  # don't set window to modified when loding a file
         self.lastSearch = (0, 0)
-        font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL)
 
         # widgets
         self.text = wx.stc.StyledTextCtrl(self, style=wx.TE_MULTILINE)
         self.text.SetMarginWidth(1, 0)
-        self.text.StyleSetFont(0, font)
 
         # Eventhandler
         self.Bind(wx.EVT_CLOSE, self.onClose)
@@ -230,6 +228,27 @@ class WritePanel(wx.Panel):
         """Resets the search"""
         self.lastSearch = (0, 0)
 
+    def setFont(self, fontData):
+        """Set font of the textctrl.
+
+        Parameters
+        ----------
+        fontData : wx.FontData
+            The font data
+        """
+        font = fontData.GetChosenFont()
+        self.text.StyleSetFont(wx.stc.STC_STYLE_DEFAULT, font)
+        self.text.StyleClearAll()
+
+    def getFont(self):
+        """Returns the current font of the textctrl.
+
+        Returns
+        -------
+        wx.Font
+        """
+        return self.text.StyleGetFont(wx.stc.STC_STYLE_DEFAULT)
+
 
 class MainFrame(wx.Frame):
 
@@ -259,6 +278,7 @@ class MainFrame(wx.Frame):
         editmenu = wx.Menu()
         searchmenu = wx.Menu()
         helpmenu = wx.Menu()
+        viewmenu = wx.Menu()
 
         menuNew = filemenu.Append(wx.ID_NEW, _("New"), _(" Create new file"))
         menuOpen = filemenu.Append(wx.ID_OPEN, _("Open"), _(" Open file"))
@@ -295,11 +315,15 @@ class MainFrame(wx.Frame):
         menuFindRep = searchmenu.Append(
             wx.ID_REPLACE, _("Find and Replace"), _(" Search for and replace text"))
 
+        menuFont = viewmenu.Append(wx.ID_SELECT_FONT, _(
+            "Select Font"), _(" Change the editor font"))
+
         # create menubar
         menubar = wx.MenuBar()
         menubar.Append(filemenu, _("&File"))
         menubar.Append(editmenu, _("&Edit"))
         menubar.Append(searchmenu, _("&Search"))
+        menubar.Append(viewmenu, _("&View"))
         menubar.Append(helpmenu, _("&Help"))
         self.SetMenuBar(menubar)
 
@@ -307,7 +331,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onExit, menuExit)
         self.Bind(wx.EVT_MENU, self.onAbout, menuAbout)
         self.Bind(wx.EVT_MENU, self.onOpen, menuOpen)
-        self.Bind(wx.EVT_MENU, self.newFile, menuNew)
+        self.Bind(wx.EVT_MENU, self.onNew, menuNew)
         self.Bind(wx.EVT_MENU, self.onSave, menuSave)
         self.Bind(wx.EVT_MENU, self.onSaveAs, menuSaveAs)
         self.Bind(wx.EVT_CLOSE, self.onExit)
@@ -324,6 +348,8 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onSearchNext, menuFindNext)
         self.Bind(wx.EVT_MENU, self.onSearchPrev, menuFindPrev)
         self.Bind(wx.EVT_MENU, self.onSearchAndReplace, menuFindRep)
+
+        self.Bind(wx.EVT_MENU, self.onSelectFont, menuFont)
 
         self.Bind(wx.EVT_FIND, self.onFind)
         self.Bind(wx.EVT_FIND_NEXT, self.onFind)
@@ -390,6 +416,17 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         info.SetLicence(licence)
         info.AddDeveloper("Jens Wilberg <jens_wilberg@outlook.com>")
         wx.adv.AboutBox(info)
+
+    def onNew(self, event):
+        """"Creates a new file."""
+        self.writePanel.Close()
+        self.newFileCounter += 1
+        filename = _("Untitled %d" % (self.newFileCounter))
+        self.writePanel = WritePanel(filename, self)
+        self.SetTitle("%s - pyed" % (filename))
+        self.GetSizer().Add(self.writePanel, 1, wx.EXPAND, 1)
+        self.Layout()
+        self.writePanel.SetFocus()
 
     def onOpen(self, event):
         """Open a file."""
@@ -495,18 +532,18 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         dlg.Destroy()
         self.writePanel.resetSearch()
 
-    ## Methods ##
-    def newFile(self, event):
-        """"Creates a new file."""
-        self.writePanel.Close()
-        self.newFileCounter += 1
-        filename = _("Untitled %d" % (self.newFileCounter))
-        self.writePanel = WritePanel(filename, self)
-        self.SetTitle("%s - pyed" % (filename))
-        self.GetSizer().Add(self.writePanel, 1, wx.EXPAND, 1)
-        self.Layout()
-        self.writePanel.SetFocus()
+    def onSelectFont(self, event):
+        """Select a new font."""
+        fontData = wx.FontData()
+        font = self.writePanel.getFont()
+        fontData.SetInitialFont(font)
+        fontDlg = wx.FontDialog(self, fontData)
+        if fontDlg.ShowModal() == wx.ID_OK:
+            # forward wx.FontData from fontDlg because if I use the variable
+            # fontData to get the font it throws invalid font errors.
+            self.writePanel.setFont(fontDlg.GetFontData())
 
+    ## Methods ##
     def showDlg(self, parent, message, title, style):
         """Displays a dialog."""
         dlg = wx.MessageDialog(parent=parent, message=message,
