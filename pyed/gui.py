@@ -32,13 +32,15 @@ __version__ = VERSION_STRING
 
 class WritePanel(wx.Panel):
 
-    def __init__(self, filename, *args, **kwargs):
+    def __init__(self, filename, font, *args, **kwargs):
         """Class of the main Panel.
 
         Parameters
         ----------
         filename : str
             The filename of the current file
+        font : wx.Font
+            The default font for the widgets
 
         The MainPanel takes the same arguments as the wx.Panel class.
         """
@@ -52,6 +54,8 @@ class WritePanel(wx.Panel):
         # widgets
         self.text = wx.stc.StyledTextCtrl(self, style=wx.TE_MULTILINE)
         self.text.SetMarginWidth(1, 0)
+        self.text.StyleSetFont(wx.stc.STC_STYLE_DEFAULT, font)
+        self.text.StyleClearAll()
 
         # Eventhandler
         self.Bind(wx.EVT_CLOSE, self.onClose)
@@ -261,11 +265,13 @@ class MainFrame(wx.Frame):
         # stuff
         self.newFileCounter = 1
         filename = _("Untitled %d" % (self.newFileCounter))
+        defaultFont = wx.Font(
+            12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, "Monospace")
 
         # widgets
         statusbar = self.CreateStatusBar(2)
         statusbar.SetStatusWidths([-1, 125])
-        self.writePanel = WritePanel(filename, self)
+        self.writePanel = WritePanel(filename, defaultFont, self)
 
         # open file from cli
         if filepath:
