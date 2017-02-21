@@ -557,19 +557,3 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         retval = dlg.ShowModal()
         dlg.Destroy()
         return retval
-
-
-def run(filepath=None):
-    """Run the Application.
-
-    Parameters
-    ----------
-    filepath : str
-        the path to a file
-    """
-    app = wx.App()
-    frame = MainFrame(filepath, parent=None, title="pyed",
-                      size=(800, 600))
-    app.SetTopWindow(frame)
-    frame.Show()
-    app.MainLoop()

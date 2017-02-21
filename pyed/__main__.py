@@ -20,7 +20,8 @@
 """Main Module."""
 import argparse
 import gettext
-from . import gui
+import wx
+from .gui import MainFrame
 
 _ = gettext.gettext
 
@@ -31,7 +32,12 @@ def main():
     parser.add_argument(_("file"), metavar=_("file"), nargs='?',
                         help=_("the path to a file"))
     args = parser.parse_args()
-    gui.run(args.file)
+    app = wx.App()
+    frame = MainFrame(args.file, parent=None, title="pyed",
+                      size=(800, 600))
+    app.SetTopWindow(frame)
+    frame.Show()
+    app.MainLoop()
 
 
 if __name__ == '__main__':
