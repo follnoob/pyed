@@ -42,7 +42,7 @@ When you want to open or create a file you can use the  cli
 
 ## Author and License
 
-Copyright (C) Jens Wilberg Jannuary 2017
+Copyright (C) Jens Wilberg January 2017
 
     pyed is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
