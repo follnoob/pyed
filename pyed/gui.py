@@ -19,6 +19,8 @@
 """GUI for pyed."""
 import os
 import re
+import codecs
+import json
 
 import wx
 import wx.adv
@@ -232,15 +234,14 @@ class WritePanel(wx.Panel):
         """Resets the search"""
         self.lastSearch = (0, 0)
 
-    def setFont(self, fontData):
+    def setFont(self, font):
         """Set font of the textctrl.
 
         Parameters
         ----------
-        fontData : wx.FontData
-            The font data
+        font : wx.Font
+            The font
         """
-        font = fontData.GetChosenFont()
         self.text.StyleSetFont(wx.stc.STC_STYLE_DEFAULT, font)
         self.text.StyleClearAll()
 
@@ -265,10 +266,19 @@ class MainFrame(wx.Frame):
         # stuff
         self.newFileCounter = 1
         filename = _("Untitled %d" % (self.newFileCounter))
+        userHome = os.path.expanduser('~')
+        confDir = os.path.join(userHome, ".config", "pyed")
+        self.settingsPath = os.path.join(confDir, "settings.json")
+        if not os.path.exists(confDir):
+            os.mkdir(confDir)
         defaultFont = wx.Font(
             12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, "Monospace")
-
-        # widgets
+        self.settings = {"font": str(defaultFont.GetNativeFontInfo())}
+        if os.path.exists(self.settingsPath):
+            with codecs.open(self.settingsPath, "r", "utf-8") as f:
+                self.settings = json.load(f)
+            defaultFont = wx.Font(self.settings["font"])
+            # widgets
         statusbar = self.CreateStatusBar(2)
         statusbar.SetStatusWidths([-1, 125])
         self.writePanel = WritePanel(filename, defaultFont, self)
@@ -547,7 +557,10 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         if fontDlg.ShowModal() == wx.ID_OK:
             # forward wx.FontData from fontDlg because if I use the variable
             # fontData to get the font it throws invalid font errors.
-            self.writePanel.setFont(fontDlg.GetFontData())
+            font = fontDlg.GetFontData().GetChosenFont()
+            self.settings["font"] = str(font.GetNativeFontInfo())
+            self.saveSettings()
+            self.writePanel.setFont(font)
 
     ## Methods ##
     def showDlg(self, parent, message, title, style):
@@ -557,3 +570,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         retval = dlg.ShowModal()
         dlg.Destroy()
         return retval
+
+    def saveSettings(self):
+        """Saves the settings."""
+        with codecs.open(self.settingsPath, "w+", "utf-8") as of:
+            json.dump(self.settings, of)
