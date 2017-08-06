@@ -2,29 +2,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python",
+            "name": "Python Module",
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
-            "pythonPath": "${config.python.pythonPath}",
-            "program": "pyed.py",
-            "cwd": "${workspaceRoot}",
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ],
-            "args": [
-                //"test.txt"
-            ]
-        },
-        {
-            "name": "Python Windows",
-            "type": "python",
-            "request": "launch",
-            "stopOnEntry": true,
-            "pythonPath": "python",
-            "program": "${file}",
+            "pythonPath": "${config:python.pythonPath}",
+            "module": "pyed",
             "cwd": "${workspaceRoot}",
             "debugOptions": [
                 "WaitOnAbnormalExit",

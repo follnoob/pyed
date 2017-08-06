@@ -1,6 +1,6 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "python.pythonPath": "python3",
+    "python.pythonPath": "python", // use 'python3' if python doesn't point to python 3.X
     "python.linting.flake8Enabled": true,
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Path": "flake8",
