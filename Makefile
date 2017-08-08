@@ -2,7 +2,7 @@
 # Python path
 PYTHON=python3
 
-build: sdist wheel
+build: clean sdist wheel
 
 sdist:
 	$(PYTHON) setup.py sdist
@@ -14,6 +14,6 @@ install:
 	$(PYTHON) setup.py install
 
 clean:
-	rm -rf pyed.egg-info
+	rm -rf *.egg-info
 	rm -rf build
 	rm -rf dist
