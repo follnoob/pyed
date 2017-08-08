@@ -56,6 +56,3 @@ Copyright (C) Jens Wilberg January 2017
 
     You should have received a copy of the GNU General Public License
     along with pyed.  If not, see <http://www.gnu.org/licenses/>.
-
-    The R script can be used, copied and modified under the terms of the GNU
-    General Public License version 2.
