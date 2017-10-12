@@ -21,6 +21,7 @@ import os
 import re
 import codecs
 import json
+import math
 
 import wx
 import wx.adv
@@ -52,9 +53,11 @@ class WritePanel(wx.Panel):
         self.filename = filename
         self.fileLoaded = False  # don't set window to modified when loding a file
         self.lastSearch = (0, 0)
+        self.numberSize = 12
 
         # widgets
         self.text = wx.stc.StyledTextCtrl(self, style=wx.TE_MULTILINE)
+        self.text.SetMarginType(1, wx.stc.STC_MARGIN_NUMBER)
         self.text.SetMarginWidth(1, 0)
         self.text.StyleSetFont(wx.stc.STC_STYLE_DEFAULT, font)
         self.text.StyleClearAll()
@@ -86,6 +89,9 @@ class WritePanel(wx.Panel):
             event.Skip()
             return
         self.GetParent().SetTitle("*%s - pyed" % (self.filename))
+        if self.text.GetMarginWidth(1) > 0:
+            digits = int(math.log10(self.text.GetLineCount())) + 1
+            self.text.SetMarginWidth(1, self.numberSize * digits)
         event.Skip()
 
     def updateLineCol(self, event):
@@ -254,6 +260,14 @@ class WritePanel(wx.Panel):
         """
         return self.text.StyleGetFont(wx.stc.STC_STYLE_DEFAULT)
 
+    def showLineNumbers(self):
+        """Shwos the line nnumber on the left side."""
+        if self.text.GetMarginWidth(1) > 0:
+            self.text.SetMarginWidth(1, 0)
+        else:
+            digits = int(math.log10(self.text.GetLineCount())) + 1
+            self.text.SetMarginWidth(1, self.numberSize * digits)
+
 
 class MainFrame(wx.Frame):
 
@@ -273,7 +287,8 @@ class MainFrame(wx.Frame):
             os.mkdir(confDir)
         defaultFont = wx.Font(
             12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, "Monospace")
-        self.settings = {"font": str(defaultFont.GetNativeFontInfo())}
+        self.settings = {"font": str(defaultFont.GetNativeFontInfo()),
+                         "show_line_numbers": False}
         if os.path.exists(self.settingsPath):
             with codecs.open(self.settingsPath, "r", "utf-8") as f:
                 self.settings = json.load(f)
@@ -281,7 +296,8 @@ class MainFrame(wx.Frame):
             # widgets
         statusbar = self.CreateStatusBar(2)
         statusbar.SetStatusWidths([-1, 125])
-        self.writePanel = WritePanel(filename, defaultFont, self)
+        self.writePanel = WritePanel(
+            filename, defaultFont, self)
 
         # open file from cli
         if filepath:
@@ -333,6 +349,9 @@ class MainFrame(wx.Frame):
 
         menuFont = viewmenu.Append(wx.ID_SELECT_FONT, _(
             "Select Font"), _(" Change the editor font"))
+        menuLineNumber = viewmenu.Append(wx.ID_ANY, _("Show Line Numbers"),
+                                         _(" Shows the line numbers on the left side"),
+                                         kind=wx.ITEM_CHECK)
 
         # create menubar
         menubar = wx.MenuBar()
@@ -366,6 +385,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onSearchAndReplace, menuFindRep)
 
         self.Bind(wx.EVT_MENU, self.onSelectFont, menuFont)
+        self.Bind(wx.EVT_MENU, self.onShowLines, menuLineNumber)
 
         self.Bind(wx.EVT_FIND, self.onFind)
         self.Bind(wx.EVT_FIND_NEXT, self.onFind)
@@ -395,6 +415,9 @@ class MainFrame(wx.Frame):
         # self.Bind(wx.EVT_MENU, self.onSearchAndReplace, id=eventId)
         accTable = wx.AcceleratorTable(table)
         self.SetAcceleratorTable(accTable)
+        if self.settings["show_line_numbers"]:
+            menuLineNumber.Check()
+            self.writePanel.showLineNumbers()
 
         # layout
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -561,6 +584,15 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
             self.settings["font"] = str(font.GetNativeFontInfo())
             self.saveSettings()
             self.writePanel.setFont(font)
+
+    def onShowLines(self, event):
+        """Shows line numbers."""
+        self.writePanel.showLineNumbers()
+        if not self.settings["show_line_numbers"]:
+            self.settings["show_line_numbers"] = True
+        else:
+            self.settings["show_line_numbers"] = False
+        self.saveSettings()
 
     ## Methods ##
     def showDlg(self, parent, message, title, style):
