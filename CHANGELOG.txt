@@ -1,6 +1,14 @@
 pyed
 ====
 
+Version 0.1.1 from 2017/09/12
+-----------------------------
+- updated requirement wxPython
+- added font-settings
+- added show line numbers setting
+- all settings are persisten and are saved
+  in '~/.config/pyed/settings.json'
+
 Version 0.1.0 from 2017/01/19
 -----------------------------
 
