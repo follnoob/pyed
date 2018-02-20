@@ -90,3 +90,6 @@ ENV/
 
 # testfile
 test.txt
+
+# IDE
+.vscode
