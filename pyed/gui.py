@@ -97,7 +97,7 @@ class WritePanel(wx.Panel):
     def updateLineCol(self, event):
         """Updates the line and col number on statusbar."""
         bl, c, l = self.text.PositionToXY(self.text.GetInsertionPoint())
-        status = "Line: %d Column: %d" % (l, c)
+        status = "Line: %d Column: %d" % (l + 1, c)
         statusbar = self.GetParent().GetStatusBar()
         statusbar.SetStatusText(status, 1)
         # ugly method to change the size of a statusbar column
