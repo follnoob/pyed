@@ -461,7 +461,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         self.writePanel.Close()
         self.newFileCounter += 1
         filename = _("Untitled %d" % (self.newFileCounter))
-        self.writePanel = WritePanel(filename, self)
+        self.writePanel = WritePanel(
+            filename, wx.Font(self.settings["font"]), self)
         self.SetTitle("%s - pyed" % (filename))
         self.GetSizer().Add(self.writePanel, 1, wx.EXPAND, 1)
         self.Layout()
