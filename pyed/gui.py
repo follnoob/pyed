@@ -46,6 +46,7 @@ class WritePanel(wx.Panel):
             The default font for the widgets
 
         The MainPanel takes the same arguments as the wx.Panel class.
+
         """
         super(WritePanel, self).__init__(*args, **kwargs)
         # stuff
@@ -74,7 +75,7 @@ class WritePanel(wx.Panel):
 
     ## EventHandler ##
     def onClose(self, event):
-        """Close the panel"""
+        """Close the panel."""
         if self.text.IsModified():
             parent = self.GetParent()
             retval = parent.showDlg(parent, _("There are unsaved changes.\n Do you want to save"),
@@ -96,8 +97,9 @@ class WritePanel(wx.Panel):
 
     def updateLineCol(self, event):
         """Updates the line and col number on statusbar."""
-        bl, c, l = self.text.PositionToXY(self.text.GetInsertionPoint())
-        status = "Line: %d Column: %d" % (l + 1, c)
+        bl, column, line = self.text.PositionToXY(
+            self.text.GetInsertionPoint())
+        status = "Line: %d Column: %d" % (line + 1, column)
         statusbar = self.GetParent().GetStatusBar()
         statusbar.SetStatusText(status, 1)
         # ugly method to change the size of a statusbar column
@@ -115,6 +117,7 @@ class WritePanel(wx.Panel):
         ----------
         filepath: str
             path to the file
+
         """
         self.fileLoaded = True
         if os.path.exists(filepath):
@@ -151,7 +154,8 @@ class WritePanel(wx.Panel):
         Returns
         -------
         bool
-            True if somthing is selected. Elese False
+            True if somthing is selected. Else False
+
         """
         return True if self.text.GetSelectedText() else False
 
@@ -188,6 +192,7 @@ class WritePanel(wx.Panel):
             The sum of flags for the search
         findStr : str
             The string to search. If empty, the selected string is used
+
         """
         if not findStr:
             findStr = self.text.GetSelectedText()
@@ -214,6 +219,7 @@ class WritePanel(wx.Panel):
             String wich replaces the found string
         findStr : str
             The string to search
+
         """
         select = self.text.GetSelectedText()
         if select == findStr:
@@ -228,6 +234,7 @@ class WritePanel(wx.Panel):
             String wich replaces the found string
         findStr : str
             The string to search
+
         """
         text = self.text.GetValue()
         # Find start position
@@ -237,7 +244,7 @@ class WritePanel(wx.Panel):
             self.text.Replace(start, start + len(findStr), replaceStr)
 
     def resetSearch(self):
-        """Resets the search"""
+        """Resets the search."""
         self.lastSearch = (0, 0)
 
     def setFont(self, font):
@@ -247,9 +254,23 @@ class WritePanel(wx.Panel):
         ----------
         font : wx.Font
             The font
+
         """
         self.text.StyleSetFont(wx.stc.STC_STYLE_DEFAULT, font)
         self.text.StyleClearAll()
+
+    def goto(self, line, column):
+        """Goto lina and column.
+
+        Parameters
+        ----------
+        line : int
+            linenumber
+        column : int
+            columnnumber
+
+        """
+        raise NotImplementedError
 
     def getFont(self):
         """Returns the current font of the textctrl.
@@ -257,6 +278,7 @@ class WritePanel(wx.Panel):
         Returns
         -------
         wx.Font
+
         """
         return self.text.StyleGetFont(wx.stc.STC_STYLE_DEFAULT)
 
@@ -275,6 +297,7 @@ class MainFrame(wx.Frame):
         """Class for the MainFrame.
 
         The MainFrame takes the same arguments as the wx.Frame class.
+
         """
         super(MainFrame, self).__init__(*args, **kwargs)
         # stuff
@@ -346,6 +369,9 @@ class MainFrame(wx.Frame):
             wx.ID_ANY, _("Find Previous\tSHIFT+CTRL+G"), _(" Search backwards for the same text"))
         menuFindRep = searchmenu.Append(
             wx.ID_REPLACE, _("Find and Replace"), _(" Search for and replace text"))
+        searchmenu.AppendSeparator()
+        menuGoto = searchmenu.Append(wx.ID_PREVIEW_GOTO, _(
+            "Go to.."), _(" Go to a specific location in the document"))
 
         menuFont = viewmenu.Append(wx.ID_SELECT_FONT, _(
             "Select Font"), _(" Change the editor font"))
@@ -383,6 +409,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onSearchNext, menuFindNext)
         self.Bind(wx.EVT_MENU, self.onSearchPrev, menuFindPrev)
         self.Bind(wx.EVT_MENU, self.onSearchAndReplace, menuFindRep)
+        self.Bind(wx.EVT_MENU, self.onGoTo, menuGoto)
 
         self.Bind(wx.EVT_MENU, self.onSelectFont, menuFont)
         self.Bind(wx.EVT_MENU, self.onShowLines, menuLineNumber)
@@ -457,7 +484,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         wx.adv.AboutBox(info)
 
     def onNew(self, event):
-        """"Creates a new file."""
+        """Creates a new file."""
         self.writePanel.Close()
         self.newFileCounter += 1
         filename = _("Untitled %d" % (self.newFileCounter))
@@ -571,6 +598,10 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         dlg = event.GetEventObject()
         dlg.Destroy()
         self.writePanel.resetSearch()
+
+    def onGoTo(self, event):
+        """Handels goto event."""
+        raise NotImplementedError
 
     def onSelectFont(self, event):
         """Select a new font."""
