@@ -21,7 +21,7 @@
 import argparse
 import gettext
 import wx
-from .gui import MainFrame
+from pyed.gui import MainFrame
 
 _ = gettext.gettext
 

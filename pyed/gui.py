@@ -27,7 +27,7 @@ import wx
 import wx.adv
 import wx.stc
 
-from .__version__ import VERSION_STRING
+from pyed.__version__ import VERSION_STRING
 
 _ = wx.GetTranslation
 __version__ = VERSION_STRING
@@ -52,7 +52,8 @@ class WritePanel(wx.Panel):
         # stuff
         self.path = None
         self.filename = filename
-        self.fileLoaded = False  # don't set window to modified when loding a file
+        # don't set window to modified when loding a file
+        self.fileLoaded = False
         self.lastSearch = (0, 0)
         self.numberSize = 12
 
@@ -78,8 +79,8 @@ class WritePanel(wx.Panel):
         """Close the panel."""
         if self.text.IsModified():
             parent = self.GetParent()
-            retval = parent.showDlg(parent, _("There are unsaved changes.\n Do you want to save"),
-                                    _("Unsaved Canges"), wx.YES_NO | wx.YES_DEFAULT)
+            retval = parent.showDlg(parent, _("There are unsaved changes.\n Do \
+            you want to save"), _("Unsaved Canges"), wx.YES_NO | wx.YES_DEFAULT)
             if retval == wx.ID_YES:
                 self.saveFile()
         self.Destroy()
@@ -363,12 +364,14 @@ class MainFrame(wx.Frame):
 
         menuFind = searchmenu.Append(
             wx.ID_FIND, _("Find"), _(" Search for text"))
-        menuFindNext = searchmenu.Append(
-            wx.ID_ANY, _("Find Next\tCTRL+G"), _(" Search forwards for the same text"))
+        menuFindNext = searchmenu.Append(wx.ID_ANY, _("Find Next\tCTRL+G"),
+                                         _(" Search forwards for the same text"))
         menuFindPrev = searchmenu.Append(
-            wx.ID_ANY, _("Find Previous\tSHIFT+CTRL+G"), _(" Search backwards for the same text"))
+            wx.ID_ANY, _("Find Previous\tSHIFT+CTRL+G"),
+            _(" Search backwards for the same text"))
         menuFindRep = searchmenu.Append(
-            wx.ID_REPLACE, _("Find and Replace"), _(" Search for and replace text"))
+            wx.ID_REPLACE, _("Find and Replace"),
+            _(" Search for and replace text"))
         searchmenu.AppendSeparator()
         menuGoto = searchmenu.Append(wx.ID_PREVIEW_GOTO, _(
             "Go to.."), _(" Go to a specific location in the document"))
@@ -499,7 +502,8 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
         """Open a file."""
         # The filedialog is here becaus I change the panel
         fdlg = wx.FileDialog(self, _("Choose file"),
-                             os.getcwd(), "", "*", wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+                             os.getcwd(), "", "*", wx.FD_OPEN |
+                             wx.FD_FILE_MUST_EXIST)
         if fdlg.ShowModal() == wx.ID_OK:
             self.writePanel.Close()
             filename = fdlg.GetFilename()
