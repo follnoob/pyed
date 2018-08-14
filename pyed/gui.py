@@ -33,6 +33,91 @@ _ = wx.GetTranslation
 __version__ = VERSION_STRING
 
 
+class GotoDialog(wx.Dialog):
+    """Class for goto dialog.
+
+    This class uses the same parameters as wx.Dialog.
+
+    Parameters
+    ----------
+    parent : wx.Window
+        parent window
+    id : int
+        id of the dialog
+    max : tuple of int
+        max value for line and column
+    title : str
+        title of the dialog
+
+    """
+
+    def __init__(self, parent, id=wx.ID_ANY, max=(1, 0), title=_("GoTo"), *args,
+                 **kwargs):
+        """init."""
+        super(wx.Dialog, self).__init__(parent, id, title, *args, **kwargs)
+        self._ok = False
+        # Items
+        self.spinLine = wx.SpinCtrl(
+            self, wx.ID_ANY, min=1, max=max[0], initial=1)
+        spinLineLabel = wx.StaticText(self, wx.ID_ANY, _("Line: "))
+        self.spinColumn = wx.SpinCtrl(self, wx.ID_ANY, max=max[1], initial=0)
+        spinColumnLabel = wx.StaticText(self, wx.ID_ANY, _("Column: "))
+        okButton = wx.Button(self, wx.ID_OK, _("Jump To"))
+        cancelButton = wx.Button(self, wx.ID_CANCEL, _("Cancel"))
+
+        okButton.Bind(wx.EVT_BUTTON, self.onOK)
+        self.Bind(wx.EVT_SPINCTRL, self.onSpin, self.spinLine)
+
+        # Layout
+        btnSizer = wx.StdDialogButtonSizer()
+        btnSizer.SetAffirmativeButton(okButton)
+        btnSizer.SetCancelButton(cancelButton)
+        btnSizer.Realize()
+
+        lineSize = wx.BoxSizer(wx.HORIZONTAL)
+        lineSize.Add(spinLineLabel, 1, wx.EXPAND, 1)
+        lineSize.Add(self.spinLine, 1, wx.EXPAND, 1)
+
+        columnSizer = wx.BoxSizer(wx.HORIZONTAL)
+        columnSizer.Add(spinColumnLabel, 1, wx.EXPAND, 0)
+        columnSizer.Add(self.spinColumn, 1, wx.EXPAND, 1)
+
+        mainSizer = wx.BoxSizer(wx.VERTICAL)
+        mainSizer.Add(lineSize)
+        mainSizer.AddSpacer(10)
+        mainSizer.Add(columnSizer)
+        mainSizer.AddSpacer(10)
+        mainSizer.Add(btnSizer, 1, wx.EXPAND, 0)
+        self.SetSizerAndFit(mainSizer)
+
+    def onOK(self, event):
+        """Handles buttonclicks."""
+        self._ok = True
+        event.Skip()
+
+    def onSpin(self, event):
+        """Handels spincontrol events."""
+        n = self.spinLine.GetValue() - 1
+        columns = len(self.GetParent().text.GetLineText(n))
+        self.spinColumn.SetMax(columns)
+
+    def GetValue(self):
+        """Returns line and column.
+
+        This function returns the line and column if the user selected them.
+        otherwise it returns None.
+
+        Returns
+        -------
+        tuple of int or None
+            (line, column)
+
+        """
+        if not self._ok:
+            return None
+        return (self.spinLine.GetValue() - 1, self.spinColumn.GetValue())
+
+
 class WritePanel(wx.Panel):
 
     def __init__(self, filename, font, *args, **kwargs):
@@ -79,8 +164,8 @@ class WritePanel(wx.Panel):
         """Close the panel."""
         if self.text.IsModified():
             parent = self.GetParent()
-            retval = parent.showDlg(parent, _("There are unsaved changes.\n Do \
-            you want to save"), _("Unsaved Canges"), wx.YES_NO | wx.YES_DEFAULT)
+            retval = parent.showDlg(parent, _("There are unsaved changes.\n Do you want to save"),
+                                    _("Unsaved Canges"), wx.YES_NO | wx.YES_DEFAULT)
             if retval == wx.ID_YES:
                 self.saveFile()
         self.Destroy()
@@ -260,18 +345,22 @@ class WritePanel(wx.Panel):
         self.text.StyleSetFont(wx.stc.STC_STYLE_DEFAULT, font)
         self.text.StyleClearAll()
 
-    def goto(self, line, column):
-        """Goto lina and column.
+    def goto(self):
+        """Goto line and column.
 
-        Parameters
-        ----------
-        line : int
-            linenumber
-        column : int
-            columnnumber
+        This functions opens a goto dialog.
 
         """
-        raise NotImplementedError
+        lines = self.text.LineCount
+        columns = len(self.text.GetLineText(0))
+        with GotoDialog(self, wx.ID_ANY, (lines, columns)) as dlg:
+            if dlg.ShowModal() == wx.ID_OK:
+                line, column = dlg.GetValue()
+                position = self.text.XYToPosition(column, line)
+                # SetInsertionPoint Selects the text between the position from
+                # the old curser to the new curser so we use SetSelection with
+                # only the new position
+                self.text.SetSelection(position, position)
 
     def getFont(self):
         """Returns the current font of the textctrl.
@@ -605,7 +694,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
 
     def onGoTo(self, event):
         """Handels goto event."""
-        raise NotImplementedError
+        self.writePanel.goto()
 
     def onSelectFont(self, event):
         """Select a new font."""
