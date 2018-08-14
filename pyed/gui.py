@@ -96,7 +96,7 @@ class GotoDialog(wx.Dialog):
         event.Skip()
 
     def onSpin(self, event):
-        """Handels spincontrol events."""
+        """Handles spincontrol events."""
         n = self.spinLine.GetValue() - 1
         columns = len(self.GetParent().text.GetLineText(n))
         self.spinColumn.SetMax(columns)
@@ -119,20 +119,21 @@ class GotoDialog(wx.Dialog):
 
 
 class WritePanel(wx.Panel):
+    """Class of the main Panel.
+
+    Parameters
+    ----------
+    filename : str
+        The filename of the current file
+    font : wx.Font
+        The default font for the widgets
+
+    The MainPanel takes the same arguments as the wx.Panel class.
+
+    """
 
     def __init__(self, filename, font, *args, **kwargs):
-        """Class of the main Panel.
-
-        Parameters
-        ----------
-        filename : str
-            The filename of the current file
-        font : wx.Font
-            The default font for the widgets
-
-        The MainPanel takes the same arguments as the wx.Panel class.
-
-        """
+        """init."""
         super(WritePanel, self).__init__(*args, **kwargs)
         # stuff
         self.path = None
@@ -165,13 +166,13 @@ class WritePanel(wx.Panel):
         if self.text.IsModified():
             parent = self.GetParent()
             retval = parent.showDlg(parent, _("There are unsaved changes.\n Do you want to save"),
-                                    _("Unsaved Canges"), wx.YES_NO | wx.YES_DEFAULT)
+                                    _("Unsaved Changes"), wx.YES_NO | wx.YES_DEFAULT)
             if retval == wx.ID_YES:
                 self.saveFile()
         self.Destroy()
 
     def onModify(self, event):
-        """Schows in title if text is modified."""
+        """Shows in title if text is modified."""
         if self.fileLoaded:
             event.Skip()
             return
@@ -235,12 +236,12 @@ class WritePanel(wx.Panel):
             self.text.SetSavePoint()
 
     def hasSelection(self):
-        """Check if somthing is selected.
+        """Check if something is selected.
 
         Returns
         -------
         bool
-            True if somthing is selected. Else False
+            True if something is selected. Else False
 
         """
         return True if self.text.GetSelectedText() else False
@@ -254,15 +255,15 @@ class WritePanel(wx.Panel):
         self.text.Redo()
 
     def cut(self):
-        """Cuts the selection to the clipbord."""
+        """Cuts the selection to the clipboard."""
         self.text.Cut()
 
     def copy(self):
-        """Copies the selection to the clipbord."""
+        """Copies the selection to the clipboard."""
         self.text.Copy()
 
     def paste(self):
-        """Paste from the clipbord."""
+        """Paste from the clipboard."""
         self.text.Paste()
 
     def selectAll(self):
@@ -302,7 +303,7 @@ class WritePanel(wx.Panel):
         Parameters
         ----------
         replaceStr : str
-            String wich replaces the found string
+            String which replaces the found string
         findStr : str
             The string to search
 
@@ -317,7 +318,7 @@ class WritePanel(wx.Panel):
         Parameters
         ----------
         replaceStr : str
-            String wich replaces the found string
+            String which replaces the found string
         findStr : str
             The string to search
 
@@ -373,7 +374,7 @@ class WritePanel(wx.Panel):
         return self.text.StyleGetFont(wx.stc.STC_STYLE_DEFAULT)
 
     def showLineNumbers(self):
-        """Shwos the line nnumber on the left side."""
+        """Shows the line number on the left side."""
         if self.text.GetMarginWidth(1) > 0:
             self.text.SetMarginWidth(1, 0)
         else:
@@ -382,13 +383,14 @@ class WritePanel(wx.Panel):
 
 
 class MainFrame(wx.Frame):
+    """Class for the MainFrame.
+
+    The MainFrame takes the same arguments as the wx.Frame class.
+
+    """
 
     def __init__(self, filepath=None, *args, **kwargs):
-        """Class for the MainFrame.
-
-        The MainFrame takes the same arguments as the wx.Frame class.
-
-        """
+        """init."""
         super(MainFrame, self).__init__(*args, **kwargs)
         # stuff
         self.newFileCounter = 1
@@ -446,7 +448,7 @@ class MainFrame(wx.Frame):
         self.menuCopy = editmenu.Append(wx.ID_COPY, _(
             "Copy"), _(" Copy the selection"))
         menuPaste = editmenu.Append(wx.ID_PASTE, _(
-            "Paste"), _(" Paste the clipbord"))
+            "Paste"), _(" Paste the clipboard"))
         editmenu.AppendSeparator()
         menuSelectAll = editmenu.Append(wx.ID_SELECTALL, _(
             "Select All"), _(" Select the text in the entire document"))
@@ -589,7 +591,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
 
     def onOpen(self, event):
         """Open a file."""
-        # The filedialog is here becaus I change the panel
+        # The filedialog is here because I change the panel
         fdlg = wx.FileDialog(self, _("Choose file"),
                              os.getcwd(), "", "*", wx.FD_OPEN |
                              wx.FD_FILE_MUST_EXIST)
@@ -622,7 +624,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/."""
             self.menuCopy.Enable(False)
 
     def onUndo(self, event):
-        """Undos the last Changes in the current writePanel."""
+        """Undoes the last Changes in the current writePanel."""
         self.writePanel.undo()
 
     def onRedo(self, event):
