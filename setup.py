@@ -100,7 +100,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'gui_scripts': [
-            'pyed=pyed:main',
+            'pyed=pyed.__main__:main',
         ],
     },
 )
