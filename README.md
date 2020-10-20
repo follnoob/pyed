@@ -23,8 +23,6 @@ or
 On Linux you can copy pyed.desktop to /usr/share/applications or ~/.local/share/applications
 to integrate pyed to your menu. Also you can use this file as desktop short-cut.
 
-only tested on Python 3.5.
-
 Supported operating-systems:
 
 - Linux (Main development on Mint 18)
