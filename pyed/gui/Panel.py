@@ -49,7 +49,7 @@ class WritePanel(wx.Panel):
         self.path = None
         self.filename = filename
 
-        # don't set window to modified when loding a file
+        # don't set window to modified when loading a file
         self.fileLoaded = False
         self.lastSearch = (0, 0)
         self.numberSize = 12
