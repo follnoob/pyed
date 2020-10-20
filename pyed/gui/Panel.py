@@ -106,12 +106,15 @@ class WritePanel(wx.Panel):
         statusbar = self.GetParent().GetStatusBar()
         statusbar.SetStatusText(status, 1)
 
-        # ugly method to change the size of a statusbar column
+        # change the size of the statusbar column
         font = statusbar.GetFont()
         dc = wx.WindowDC(statusbar)
         dc.SetFont(font)
         width, height = dc.GetTextExtent(status)
-        statusbar.SetStatusWidths([-1, width + 30])
+
+        # The statusbar needs to be wider to prevent elipsis
+        width += font.GetPixelSize().GetWidth() * 4
+        statusbar.SetStatusWidths([-1, width])
 
     ## Methods ##
     def openFile(self, filepath):
